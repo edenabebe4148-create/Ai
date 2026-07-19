@@ -80,7 +80,12 @@ export default function ChatArea({
   const [capabilitiesLayout, setCapabilitiesLayout] = useState<"grid" | "list">("grid");
   const [searchQuery, setSearchQuery] = useState("");
   const [previousSearches, setPreviousSearches] = useState<string[]>(() => {
-    const stored = localStorage.getItem("chatterly_prev_searches_v1");
+    let stored = null;
+    try {
+      stored = localStorage.getItem("chatterly_prev_searches_v1");
+    } catch (e) {
+      console.warn("localStorage.getItem blocked/failed:", e);
+    }
     if (stored) {
       try {
         return JSON.parse(stored);
@@ -100,7 +105,11 @@ export default function ChatArea({
 
   const savePreviousSearches = (searches: string[]) => {
     setPreviousSearches(searches);
-    localStorage.setItem("chatterly_prev_searches_v1", JSON.stringify(searches));
+    try {
+      localStorage.setItem("chatterly_prev_searches_v1", JSON.stringify(searches));
+    } catch (e) {
+      console.warn("localStorage.setItem blocked/failed:", e);
+    }
   };
 
   const fileInputRef = useRef<HTMLInputElement>(null);

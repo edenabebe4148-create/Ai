@@ -11,6 +11,31 @@ const LOCAL_STORAGE_SESSIONS_KEY = "gemini_studio_sessions_v1";
 const LOCAL_STORAGE_SETTINGS_KEY = "gemini_studio_settings_v1";
 const LOCAL_STORAGE_USER_KEY = "chatterly_user_v1";
 
+const safeLocalStorage = {
+  getItem: (key: string): string | null => {
+    try {
+      return localStorage.getItem(key);
+    } catch (e) {
+      console.warn("localStorage.getItem blocked/failed:", e);
+      return null;
+    }
+  },
+  setItem: (key: string, value: string) => {
+    try {
+      localStorage.setItem(key, value);
+    } catch (e) {
+      console.warn("localStorage.setItem blocked/failed:", e);
+    }
+  },
+  removeItem: (key: string) => {
+    try {
+      localStorage.removeItem(key);
+    } catch (e) {
+      console.warn("localStorage.removeItem blocked/failed:", e);
+    }
+  }
+};
+
 const DEFAULT_SETTINGS: UserSettings = {
   userName: "User Guest",
   preferredModel: "gemini-3.5-flash",
@@ -54,12 +79,12 @@ export default function App() {
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSidebarMobileOpen, setIsSidebarMobileOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => {
-    return localStorage.getItem("gemini_studio_onboarding_completed_v1") !== "true";
+    return safeLocalStorage.getItem("gemini_studio_onboarding_completed_v1") !== "true";
   });
 
   // Authentication State
   const [user, setUser] = useState<UserAccount | null>(() => {
-    const stored = localStorage.getItem(LOCAL_STORAGE_USER_KEY);
+    const stored = safeLocalStorage.getItem(LOCAL_STORAGE_USER_KEY);
     if (stored) {
       try {
         return JSON.parse(stored);
@@ -74,25 +99,25 @@ export default function App() {
   const [authScreen, setAuthScreen] = useState<"signin" | "signup" | "verify" | "created" | "forgot" | null>(null);
 
   const handleOnboardingComplete = () => {
-    localStorage.setItem("gemini_studio_onboarding_completed_v1", "true");
+    safeLocalStorage.setItem("gemini_studio_onboarding_completed_v1", "true");
     setShowOnboarding(false);
   };
 
   const handleAuthSuccess = (authenticatedUser: UserAccount) => {
     setUser(authenticatedUser);
-    localStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(authenticatedUser));
+    safeLocalStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(authenticatedUser));
     
     // Auto-update user name in general settings based on auth name
     const updatedSettings = { ...settings, userName: authenticatedUser.name };
     setSettings(updatedSettings);
-    localStorage.setItem(LOCAL_STORAGE_SETTINGS_KEY, JSON.stringify(updatedSettings));
+    safeLocalStorage.setItem(LOCAL_STORAGE_SETTINGS_KEY, JSON.stringify(updatedSettings));
 
     setAuthScreen(null);
   };
 
   const handleLogout = () => {
     setUser(null);
-    localStorage.removeItem(LOCAL_STORAGE_USER_KEY);
+    safeLocalStorage.removeItem(LOCAL_STORAGE_USER_KEY);
     // Switch to first thread or default
     if (sessions.length > 0) {
       setActiveSessionId(sessions[0].id);
@@ -103,7 +128,7 @@ export default function App() {
   // Load settings and sessions from LocalStorage on mount
   useEffect(() => {
     // Settings
-    const storedSettings = localStorage.getItem(LOCAL_STORAGE_SETTINGS_KEY);
+    const storedSettings = safeLocalStorage.getItem(LOCAL_STORAGE_SETTINGS_KEY);
     if (storedSettings) {
       try {
         setSettings(JSON.parse(storedSettings));
@@ -113,7 +138,7 @@ export default function App() {
     }
 
     // Sessions
-    const storedSessions = localStorage.getItem(LOCAL_STORAGE_SESSIONS_KEY);
+    const storedSessions = safeLocalStorage.getItem(LOCAL_STORAGE_SESSIONS_KEY);
     if (storedSessions) {
       try {
         const parsedSessions = JSON.parse(storedSessions);
@@ -143,20 +168,20 @@ export default function App() {
       };
       setSessions([defaultSession]);
       setActiveSessionId(defaultSession.id);
-      localStorage.setItem(LOCAL_STORAGE_SESSIONS_KEY, JSON.stringify([defaultSession]));
+      safeLocalStorage.setItem(LOCAL_STORAGE_SESSIONS_KEY, JSON.stringify([defaultSession]));
     }
   }, []);
 
   // Sync sessions to LocalStorage on change
   const saveSessions = (updatedSessions: ChatSession[]) => {
     setSessions(updatedSessions);
-    localStorage.setItem(LOCAL_STORAGE_SESSIONS_KEY, JSON.stringify(updatedSessions));
+    safeLocalStorage.setItem(LOCAL_STORAGE_SESSIONS_KEY, JSON.stringify(updatedSessions));
   };
 
   // Sync settings to LocalStorage on change
   const handleSaveSettings = (newSettings: UserSettings) => {
     setSettings(newSettings);
-    localStorage.setItem(LOCAL_STORAGE_SETTINGS_KEY, JSON.stringify(newSettings));
+    safeLocalStorage.setItem(LOCAL_STORAGE_SETTINGS_KEY, JSON.stringify(newSettings));
   };
 
   // Create a New Chat Thread

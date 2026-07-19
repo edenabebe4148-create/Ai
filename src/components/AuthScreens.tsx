@@ -85,17 +85,26 @@ export default function AuthWorkflow({
     e.preventDefault();
     if (!email) return;
     
-    // Simulating successful verification code triggering
-    setAuthFlowType("signup");
-    setScreen("verify");
+    // Direct easy success login
+    const user: UserAccount = {
+      name: email.split("@")[0] || "User",
+      email: email,
+      isAuthenticated: true,
+    };
+    onAuthSuccess(user);
   };
 
   const handleSignUpSubmit = (e: React.FormEvent) => {
     e.preventDefault();
     if (!name || !email || !password) return;
     
-    setAuthFlowType("signup");
-    setScreen("verify");
+    // Direct easy success sign up
+    const newUser: UserAccount = {
+      name: name,
+      email: email,
+      isAuthenticated: true,
+    };
+    onAuthSuccess(newUser);
   };
 
   const handleVerifySubmit = (e: React.FormEvent) => {
@@ -267,38 +276,6 @@ export default function AuthWorkflow({
                   Create one
                 </button>
               </div>
-
-              {/* Divider and social options */}
-              <div className="my-6">
-                <div className="relative flex items-center justify-center">
-                  <div className="w-full border-t border-slate-100 dark:border-slate-800"></div>
-                  <span className="absolute px-3 bg-white dark:bg-slate-950 text-slate-400 dark:text-slate-500 text-xs font-bold transition-colors">OR</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 mt-6">
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin("Google")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <GoogleIcon />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin("Apple")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <AppleIcon />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin("Phone")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <PhoneIcon />
-                  </button>
-                </div>
-              </div>
             </motion.div>
           )}
 
@@ -407,38 +384,6 @@ export default function AuthWorkflow({
                 >
                   Sign in
                 </button>
-              </div>
-
-              {/* Divider and social options */}
-              <div className="my-6">
-                <div className="relative flex items-center justify-center">
-                  <div className="w-full border-t border-slate-100 dark:border-slate-800"></div>
-                  <span className="absolute px-3 bg-white dark:bg-slate-950 text-slate-400 dark:text-slate-500 text-xs font-bold transition-colors">OR</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 mt-6">
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin("Google")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <GoogleIcon />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin("Apple")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <AppleIcon />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin("Phone")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <PhoneIcon />
-                  </button>
-                </div>
               </div>
             </motion.div>
           )}
@@ -642,6 +587,7 @@ export default function AuthWorkflow({
               </form>
 
               {/* Back to Sign In Link */}
+              {/* Sign in Link */}
               <div className="text-center text-sm text-slate-500 dark:text-slate-400 mt-6 font-normal">
                 Remember it now?{" "}
                 <button
@@ -651,38 +597,6 @@ export default function AuthWorkflow({
                 >
                   Back to Sign In
                 </button>
-              </div>
-
-              {/* Divider and social options */}
-              <div className="my-6">
-                <div className="relative flex items-center justify-center">
-                  <div className="w-full border-t border-slate-100 dark:border-slate-800"></div>
-                  <span className="absolute px-3 bg-white dark:bg-slate-950 text-slate-400 dark:text-slate-500 text-xs font-bold transition-colors">OR</span>
-                </div>
-
-                <div className="grid grid-cols-3 gap-4 mt-6">
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin("Google")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <GoogleIcon />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin("Apple")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <AppleIcon />
-                  </button>
-                  <button
-                    type="button"
-                    onClick={() => handleSocialLogin("Phone")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
-                  >
-                    <PhoneIcon />
-                  </button>
-                </div>
               </div>
             </motion.div>
           )}
