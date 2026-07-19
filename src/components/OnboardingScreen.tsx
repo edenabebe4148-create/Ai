@@ -127,7 +127,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-between bg-white text-slate-950 font-sans select-none overflow-hidden" id="onboarding-viewport">
+    <div className="fixed inset-0 z-50 flex flex-col justify-between bg-white dark:bg-slate-950 text-slate-950 dark:text-slate-100 font-sans select-none overflow-hidden transition-colors duration-300" id="onboarding-viewport">
       {/* Top Slide content */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 max-w-lg mx-auto w-full">
         <AnimatePresence mode="wait">
@@ -157,10 +157,10 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
 
             {/* Typography Content Container */}
             <div className="space-y-3 px-4">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 tracking-tight font-display">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight font-display">
                 {slides[currentSlide].title}
               </h2>
-              <p className="text-sm md:text-base text-slate-500 leading-relaxed font-normal">
+              <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-normal">
                 {slides[currentSlide].description}
               </p>
             </div>
@@ -177,7 +177,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
               key={index}
               onClick={() => setCurrentSlide(index)}
               className={`h-2.5 rounded-full transition-all duration-300 cursor-pointer ${
-                index === currentSlide ? "w-6 bg-[#FF4D4D]" : "w-2.5 bg-slate-200 hover:bg-slate-300"
+                index === currentSlide ? "w-6 bg-[#FF4D4D]" : "w-2.5 bg-slate-200 dark:bg-slate-850 hover:bg-slate-300 dark:hover:bg-slate-800"
               }`}
               id={`onboarding-dot-${index}`}
             />
@@ -189,7 +189,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
           {/* Skip button */}
           <button
             onClick={onComplete}
-            className="flex-1 py-4 text-sm font-bold text-[#FF4D4D] bg-[#FEF2F2] rounded-2xl active:bg-[#FEE2E2] transition-colors cursor-pointer text-center shadow-xs"
+            className="flex-1 py-4 text-sm font-bold text-[#FF4D4D] bg-[#FEF2F2] dark:bg-red-500/10 rounded-2xl active:bg-[#FEE2E2] dark:active:bg-red-500/20 transition-colors cursor-pointer text-center shadow-xs"
             id="onboarding-skip-btn"
           >
             Skip

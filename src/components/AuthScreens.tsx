@@ -150,13 +150,13 @@ export default function AuthWorkflow({
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col bg-white text-slate-900 select-none overflow-y-auto font-sans" id="auth-workflow-viewport">
+    <div className="absolute inset-0 z-50 flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 select-none overflow-y-auto font-sans transition-colors duration-300" id="auth-workflow-viewport">
       {/* Absolute top spacer representing mobile notch design */}
-      <div className="w-full h-8 flex items-center justify-between px-6 py-2 text-xs font-semibold text-slate-800">
+      <div className="w-full h-8 flex items-center justify-between px-6 py-2 text-xs font-semibold text-slate-800 dark:text-slate-350">
         <span>9:41</span>
         <div className="flex items-center gap-1.5">
-          <svg className="w-4 h-4 fill-slate-800" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.13 19.67 10.53 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
-          <svg className="w-4 h-4 fill-slate-800" viewBox="0 0 24 24"><path d="M22 8c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8zm-2 8H4V8h16v8z"/></svg>
+          <svg className="w-4 h-4 fill-slate-800 dark:fill-slate-350" viewBox="0 0 24 24"><path d="M12 3c-4.97 0-9 4.03-9 9 0 2.12.74 4.07 1.97 5.61L4.35 19.4c-.39.39-.39 1.02 0 1.41.39.39 1.02.39 1.41 0l1.9-1.9C9.13 19.67 10.53 20 12 20c4.97 0 9-4.03 9-9s-4.03-9-9-9zm0 15c-3.31 0-6-2.69-6-6s2.69-6 6-6 6 2.69 6 6-2.69 6-6 6z"/></svg>
+          <svg className="w-4 h-4 fill-slate-800 dark:fill-slate-350" viewBox="0 0 24 24"><path d="M22 8c0-1.1-.9-2-2-2H4c-1.1 0-2 .9-2 2v8c0 1.1.9 2 2 2h16c1.1 0 2-.9 2-2V8zm-2 8H4V8h16v8z"/></svg>
         </div>
       </div>
 
@@ -181,17 +181,17 @@ export default function AuthWorkflow({
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
                   WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
-                <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
+                <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
                   <AlertCircle className="w-5 h-5" />
                 </button>
               </div>
 
               {/* Central Title */}
               <div className="my-6 text-center">
-                <h2 className="text-[28px] font-extrabold text-slate-900 tracking-tight flex items-center justify-center gap-2 font-display">
+                <h2 className="text-[28px] font-extrabold text-slate-900 dark:text-white tracking-tight flex items-center justify-center gap-2 font-display">
                   Welcome back 👋
                 </h2>
-                <p className="text-slate-400 text-sm mt-1">
+                <p className="text-slate-400 dark:text-slate-450 text-sm mt-1">
                   Sign in to continue your chat journey.
                 </p>
               </div>
@@ -199,7 +199,7 @@ export default function AuthWorkflow({
               {/* Form Input Block */}
               <form onSubmit={handleSignInSubmit} className="space-y-4">
                 {/* Email Block */}
-                <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl">
+                <div className="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl transition-colors">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                     Email Address
                   </label>
@@ -209,12 +209,12 @@ export default function AuthWorkflow({
                     value={email}
                     onChange={(e) => setEmail(e.target.value)}
                     placeholder="Enter email address"
-                    className="w-full bg-transparent border-none outline-none text-slate-800 text-sm font-medium placeholder:text-slate-400"
+                    className="w-full bg-transparent border-none outline-none text-slate-800 dark:text-slate-100 text-sm font-medium placeholder:text-slate-400"
                   />
                 </div>
 
                 {/* Password Block */}
-                <div className="p-4 bg-slate-50 border border-slate-100 rounded-2xl relative">
+                <div className="p-4 bg-slate-50 dark:bg-slate-900 border border-slate-100 dark:border-slate-800 rounded-2xl relative transition-colors">
                   <label className="block text-xs font-bold text-slate-400 uppercase tracking-wider mb-1.5">
                     Password
                   </label>
@@ -225,12 +225,12 @@ export default function AuthWorkflow({
                       value={password}
                       onChange={(e) => setPassword(e.target.value)}
                       placeholder="Enter your password"
-                      className="w-full bg-transparent border-none outline-none text-slate-800 text-sm font-medium placeholder:text-slate-400"
+                      className="w-full bg-transparent border-none outline-none text-slate-800 dark:text-slate-100 text-sm font-medium placeholder:text-slate-400"
                     />
                     <button
                       type="button"
                       onClick={() => setShowPassword(!showPassword)}
-                      className="text-slate-400 hover:text-slate-600 focus:outline-none"
+                      className="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 focus:outline-none transition-colors"
                     >
                       {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                     </button>
@@ -271,29 +271,29 @@ export default function AuthWorkflow({
               {/* Divider and social options */}
               <div className="my-6">
                 <div className="relative flex items-center justify-center">
-                  <div className="w-full border-t border-slate-100"></div>
-                  <span className="absolute px-3 bg-white text-slate-400 text-xs font-bold">OR</span>
+                  <div className="w-full border-t border-slate-100 dark:border-slate-800"></div>
+                  <span className="absolute px-3 bg-white dark:bg-slate-950 text-slate-400 dark:text-slate-500 text-xs font-bold transition-colors">OR</span>
                 </div>
 
                 <div className="grid grid-cols-3 gap-4 mt-6">
                   <button
                     type="button"
                     onClick={() => handleSocialLogin("Google")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 rounded-2xl bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                   >
                     <GoogleIcon />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSocialLogin("Apple")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 rounded-2xl bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                   >
                     <AppleIcon />
                   </button>
                   <button
                     type="button"
                     onClick={() => handleSocialLogin("Phone")}
-                    className="flex items-center justify-center p-3.5 border border-slate-100 rounded-2xl bg-white hover:bg-slate-50 transition-colors cursor-pointer"
+                    className="flex items-center justify-center p-3.5 border border-slate-100 dark:border-slate-800 rounded-2xl bg-white dark:bg-slate-900 hover:bg-slate-50 dark:hover:bg-slate-800 transition-colors cursor-pointer"
                   >
                     <PhoneIcon />
                   </button>
