@@ -18,6 +18,7 @@ const DEFAULT_SETTINGS: UserSettings = {
   localLlmProvider: "ollama",
   localLlmUrl: "http://localhost:11434",
   localLlmModel: "",
+  theme: "light",
 };
 
 export default function App() {
@@ -41,6 +42,15 @@ export default function App() {
     return () => clearInterval(interval);
   }, []);
   const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
+
+  // Sync theme to document body
+  useEffect(() => {
+    if (settings.theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  }, [settings.theme]);
   const [isSettingsOpen, setIsSettingsOpen] = useState(false);
   const [isSidebarMobileOpen, setIsSidebarMobileOpen] = useState(false);
   const [showOnboarding, setShowOnboarding] = useState(() => {
@@ -437,7 +447,7 @@ export default function App() {
     <div className="w-screen h-screen overflow-hidden flex items-center justify-center bg-gradient-to-tr from-slate-900 via-slate-950 to-slate-900 p-0 sm:p-4 md:p-6" id="app-universe">
       {/* Centered Android Phone Mockup Wrapper */}
       <div 
-        className="w-full h-full sm:max-w-[412px] sm:max-h-[846px] sm:aspect-[9/18.5] sm:rounded-[44px] sm:border-[10px] sm:border-slate-800 sm:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] sm:relative sm:overflow-hidden bg-white flex flex-col" 
+        className="w-full h-full sm:max-w-[412px] sm:max-h-[846px] sm:aspect-[9/18.5] sm:rounded-[44px] sm:border-[10px] sm:border-slate-800 sm:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] sm:relative sm:overflow-hidden bg-white dark:bg-slate-950 flex flex-col transition-colors duration-300" 
         id="phone-device-frame"
       >
         {/* PHYSICAL CAMERA NOTCH / PUNCH HOLE (Only on desktop simulator layout) */}
@@ -446,19 +456,19 @@ export default function App() {
         </div>
 
         {/* ANDROID STATUS BAR (high-fidelity mockup) */}
-        <div className="w-full h-7 bg-white border-b border-slate-50 flex items-center justify-between px-6 text-xs font-bold text-slate-700 select-none shrink-0 z-30" id="android-status-bar">
+        <div className="w-full h-7 bg-white dark:bg-slate-900 border-b border-slate-50 dark:border-slate-800/80 flex items-center justify-between px-6 text-xs font-bold text-slate-700 dark:text-slate-300 select-none shrink-0 z-30 transition-colors duration-300" id="android-status-bar">
           <span className="font-sans font-semibold tracking-tight">{statusBarTime}</span>
           <div className="flex items-center gap-1.5">
             {/* Small dynamic status indicators */}
-            <svg className="w-3.5 h-3.5 fill-slate-700" viewBox="0 0 24 24" title="LTE Signal">
+            <svg className="w-3.5 h-3.5 fill-slate-700 dark:fill-slate-300 transition-colors duration-300" viewBox="0 0 24 24" title="LTE Signal">
               <path d="M2 22h20V2z"/>
             </svg>
-            <svg className="w-3.5 h-3.5 fill-slate-700" viewBox="0 0 24 24" title="Wifi Connected">
+            <svg className="w-3.5 h-3.5 fill-slate-700 dark:fill-slate-300 transition-colors duration-300" viewBox="0 0 24 24" title="Wifi Connected">
               <path d="M12 21l-12-18h24z"/>
             </svg>
             <div className="flex items-center gap-0.5" title="Battery 84%">
               <span className="text-[9px] font-mono font-extrabold mr-0.5">84%</span>
-              <svg className="w-4 h-4 fill-slate-700" viewBox="0 0 24 24">
+              <svg className="w-4 h-4 fill-slate-700 dark:fill-slate-300 transition-colors duration-300" viewBox="0 0 24 24">
                 <path d="M17 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm1 9h-1V9h1v5z"/>
               </svg>
             </div>
@@ -466,7 +476,7 @@ export default function App() {
         </div>
 
         {/* CORE APPLICATION BODY */}
-        <div className="flex-1 relative flex flex-col overflow-hidden w-full bg-white" id="android-app-viewport">
+        <div className="flex-1 relative flex flex-col overflow-hidden w-full bg-white dark:bg-slate-950 transition-colors duration-300" id="android-app-viewport">
           {/* Sidebar - Sessions & Navigation */}
           <Sidebar
             sessions={sessions}

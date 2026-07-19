@@ -36,6 +36,7 @@ export interface UserSettings {
   localLlmProvider: 'ollama' | 'lm-studio' | 'llama-cpp' | 'openai-compatible';
   localLlmUrl: string;
   localLlmModel: string;
+  theme?: 'light' | 'dark';
 }
 
 export interface UserAccount {

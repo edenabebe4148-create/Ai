@@ -3,6 +3,8 @@ import { ChatSession, AssistantPersona, UserSettings, UserAccount } from "../typ
 import { ASSISTANTS } from "../constants";
 import { motion, AnimatePresence } from "motion/react";
 import React, { useState } from "react";
+import logoWhite from "../assets/images/logowhite.png";
+import logoBlack from "../assets/images/logoblack.png";
 
 interface SidebarProps {
   sessions: ChatSession[];
@@ -64,17 +66,24 @@ export default function Sidebar({
     return ASSISTANTS.find((a) => a.id === assistantId);
   };
 
+  const logoSrc = settings.theme === "dark" ? logoBlack : logoWhite;
+
   const SidebarContent = (
-    <div className="flex flex-col h-full bg-slate-50 border-r border-slate-200/80 text-slate-800">
+    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 border-r border-slate-200/80 dark:border-slate-850 text-slate-800 dark:text-slate-100">
       
       {/* Sidebar Header */}
-      <div className="flex items-center justify-between p-5 border-b border-slate-200/60 bg-white">
+      <div className="flex items-center justify-between p-5 border-b border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900">
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center w-8.5 h-8.5 rounded-xl bg-[#FF4D4D] shadow-lg shadow-[#FF4D4D]/15">
-            <span className="text-base font-extrabold text-white font-display">C</span>
+          <div className="flex items-center justify-center w-8.5 h-8.5 rounded-xl overflow-hidden bg-transparent">
+            <img
+              src={logoSrc}
+              alt="WesAiChat Logo"
+              className="w-8 h-8 object-contain"
+              referrerPolicy="no-referrer"
+            />
           </div>
           <div>
-            <h1 className="text-sm font-extrabold tracking-tight text-slate-900 font-display">Chatterly</h1>
+            <h1 className="text-sm font-extrabold tracking-tight text-slate-900 dark:text-white font-display">WesAiChat</h1>
             <span className="text-[9px] text-[#FF4D4D] font-mono font-bold tracking-wider uppercase">AI Assistant</span>
           </div>
         </div>
@@ -90,7 +99,7 @@ export default function Sidebar({
       </div>
 
       {/* New Chat Button Area */}
-      <div className="p-4 space-y-2 bg-white/50 border-b border-slate-100">
+      <div className="p-4 space-y-2 bg-white/50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
         {!showAssistantPicker ? (
           <button
             onClick={() => setShowAssistantPicker(true)}
@@ -104,7 +113,7 @@ export default function Sidebar({
           <motion.div
             initial={{ opacity: 0, y: -5 }}
             animate={{ opacity: 1, y: 0 }}
-            className="p-2 border border-slate-200/80 bg-white rounded-2xl space-y-1.5 shadow-sm"
+            className="p-2 border border-slate-200/80 dark:border-slate-700 bg-white dark:bg-slate-800 rounded-2xl space-y-1.5 shadow-sm"
             id="assistant-picker-pane"
           >
             <div className="flex justify-between items-center px-1 pb-1">
@@ -122,12 +131,12 @@ export default function Sidebar({
                 <button
                   key={assistant.id}
                   onClick={() => selectNewChatAssistant(assistant.id)}
-                  className="flex items-center gap-2.5 w-full p-2 text-left text-xs text-slate-600 hover:bg-slate-50 rounded-xl group transition-colors cursor-pointer"
+                  className="flex items-center gap-2.5 w-full p-2 text-left text-xs text-slate-600 dark:text-slate-300 hover:bg-slate-50 dark:hover:bg-slate-800/40 rounded-xl group transition-colors cursor-pointer"
                   id={`select-persona-${assistant.id}`}
                 >
                   <span className="text-base">{assistant.avatar}</span>
                   <div className="truncate">
-                    <div className="font-bold text-slate-800 group-hover:text-[#FF4D4D] transition-colors">
+                    <div className="font-bold text-slate-800 dark:text-slate-200 group-hover:text-[#FF4D4D] transition-colors">
                       {assistant.name}
                     </div>
                     <div className="text-[10px] text-slate-400 truncate">{assistant.role}</div>
@@ -170,8 +179,8 @@ export default function Sidebar({
                   }}
                   className={`group relative flex items-center gap-3 w-full p-3 rounded-2xl cursor-pointer transition-all border ${
                     isActive
-                      ? "bg-white border-slate-200 text-slate-900 shadow-sm"
-                      : "border-transparent text-slate-500 hover:bg-slate-200/50 hover:text-slate-800"
+                      ? "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white shadow-sm"
+                      : "border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/40 hover:text-slate-800 dark:hover:text-slate-200"
                   }`}
                   id={`chat-session-${session.id}`}
                 >
@@ -212,7 +221,7 @@ export default function Sidebar({
                       </form>
                     ) : (
                       <div className="truncate">
-                        <div className={`text-xs font-bold truncate leading-tight ${isActive ? "text-slate-900" : "text-slate-700"}`}>
+                        <div className={`text-xs font-bold truncate leading-tight ${isActive ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}>
                           {session.title}
                         </div>
                         <div className="text-[9px] text-slate-400 truncate mt-0.5 font-mono">
@@ -254,17 +263,17 @@ export default function Sidebar({
       </div>
 
       {/* Bottom Profile / Auth Settings Card */}
-      <div className="p-4 border-t border-slate-200/60 bg-white">
+      <div className="p-4 border-t border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900">
         {user ? (
           /* AUTHENTICATED USER BOX */
-          <div className="flex items-center justify-between bg-slate-50 p-2.5 rounded-2xl border border-slate-100 shadow-xs">
+          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
             <div className="flex items-center gap-2.5 min-w-0">
-              <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-red-50 text-[#FF4D4D] font-extrabold border border-[#FF4D4D]/10 text-xs shadow-xs">
+              <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-red-50 dark:bg-red-500/10 text-[#FF4D4D] font-extrabold border border-[#FF4D4D]/10 text-xs shadow-xs">
                 {user.name.charAt(0).toUpperCase() || "U"}
               </div>
               <div className="truncate">
-                <div className="text-xs font-bold text-slate-800 truncate leading-tight">{user.name}</div>
-                <div className="text-[9px] text-slate-400 truncate font-mono leading-none mt-0.5">Chatterly Member</div>
+                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate leading-tight">{user.name}</div>
+                <div className="text-[9px] text-slate-400 dark:text-slate-500 truncate font-mono leading-none mt-0.5">WesAiChat Member</div>
               </div>
             </div>
             

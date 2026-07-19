@@ -179,7 +179,7 @@ export default function AuthWorkflow({
               {/* Header */}
               <div className="flex items-center justify-between py-4">
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
-                  Chatterly <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                  WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
                   <AlertCircle className="w-5 h-5" />
@@ -315,7 +315,7 @@ export default function AuthWorkflow({
               {/* Header */}
               <div className="flex items-center justify-between py-4">
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
-                  Chatterly <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                  WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
                   <AlertCircle className="w-5 h-5" />
@@ -455,7 +455,7 @@ export default function AuthWorkflow({
               {/* Header */}
               <div className="flex items-center justify-between py-4">
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
-                  Chatterly <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                  WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
                   <AlertCircle className="w-5 h-5" />
@@ -541,7 +541,7 @@ export default function AuthWorkflow({
                   <LayoutGrid className="w-5 h-5" />
                 </button>
                 <span className="text-slate-900 font-extrabold text-lg font-display">
-                  Chatterly
+                  WesAiChat
                 </span>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
                   <AlertCircle className="w-5 h-5" />
@@ -597,7 +597,7 @@ export default function AuthWorkflow({
               {/* Header */}
               <div className="flex items-center justify-between py-4">
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
-                  Chatterly <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                  WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
                   <AlertCircle className="w-5 h-5" />
@@ -699,7 +699,7 @@ export default function AuthWorkflow({
               {/* Header */}
               <div className="flex items-center justify-between py-4">
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
-                  Chatterly <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                  WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
                   <AlertCircle className="w-5 h-5" />
@@ -805,7 +805,7 @@ export default function AuthWorkflow({
                   <LayoutGrid className="w-5 h-5" />
                 </button>
                 <span className="text-[#FF4D4D] font-extrabold text-lg font-display">
-                  Chatterly
+                  WesAiChat
                 </span>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 cursor-pointer">
                   <AlertCircle className="w-5 h-5" />

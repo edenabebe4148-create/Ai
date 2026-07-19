@@ -1,5 +1,5 @@
 {
-  "name": "AI Chat App",
+  "name": "WesAiChat",
   "description": "A feature-rich, high-fidelity AI Chat App mimicking premium Android UI/UX design. Features local LLM connection (Ollama, LM Studio) with a built-in Wi-Fi network scanner, custom assistant personas, code highlighting, voice typing, and speech synthesis.",
   "requestFramePermissions": ["microphone"],
   "majorCapabilities": ["MAJOR_CAPABILITY_SERVER_SIDE_GEMINI_API"]
