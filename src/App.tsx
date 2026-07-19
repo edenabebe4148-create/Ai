@@ -493,10 +493,12 @@ export default function App() {
           <span className="font-sans font-semibold tracking-tight">{statusBarTime}</span>
           <div className="flex items-center gap-1.5">
             {/* Small dynamic status indicators */}
-            <svg className="w-3.5 h-3.5 fill-slate-700 dark:fill-slate-300 transition-colors duration-300" viewBox="0 0 24 24" title="LTE Signal">
+            <svg className="w-3.5 h-3.5 fill-slate-700 dark:fill-slate-300 transition-colors duration-300" viewBox="0 0 24 24">
+              <title>LTE Signal</title>
               <path d="M2 22h20V2z"/>
             </svg>
-            <svg className="w-3.5 h-3.5 fill-slate-700 dark:fill-slate-300 transition-colors duration-300" viewBox="0 0 24 24" title="Wifi Connected">
+            <svg className="w-3.5 h-3.5 fill-slate-700 dark:fill-slate-300 transition-colors duration-300" viewBox="0 0 24 24">
+              <title>Wifi Connected</title>
               <path d="M12 21l-12-18h24z"/>
             </svg>
             <div className="flex items-center gap-0.5" title="Battery 84%">

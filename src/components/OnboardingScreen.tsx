@@ -1,6 +1,7 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "motion/react";
 import { Sparkles, Bot, MessageSquare, Zap, Cpu } from "lucide-react";
+import onboardingImage from "../assets/images/onboarding_robot_illustration_1784331623560.jpg";
 
 interface OnboardingScreenProps {
   onComplete: () => void;
@@ -13,8 +14,8 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
     {
       title: "Meet Your Smarter Assistant",
       description: "Chat with your AI companion—designed to help you think, plan, create, and explore faster than ever.",
-      // Using the high-fidelity 3D robot illustration generated based on the Figma reference
-      image: "/src/assets/images/onboarding_robot_illustration_1784331623560.jpg",
+      // Using the high-fidelity 3D robot illustration imported as ES module
+      image: onboardingImage,
       isCustomGraphic: false,
     },
     {
