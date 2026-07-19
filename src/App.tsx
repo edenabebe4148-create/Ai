@@ -6,6 +6,7 @@ import OnboardingScreen from "./components/OnboardingScreen";
 import AuthWorkflow from "./components/AuthScreens";
 import { ChatSession, ChatMessage, UserSettings, ModelType, UserAccount } from "./types";
 import { ASSISTANTS } from "./constants";
+import { generateChatResponse } from "./geminiClient";
 
 const LOCAL_STORAGE_SESSIONS_KEY = "gemini_studio_sessions_v1";
 const LOCAL_STORAGE_SETTINGS_KEY = "gemini_studio_settings_v1";
@@ -383,29 +384,18 @@ export default function App() {
           aiContent = data.choices?.[0]?.message?.content || "No content returned from OpenAI-compatible local API.";
         }
       } else {
-        // Call Server API for Gemini
-        const response = await fetch("/api/chat", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify({
-            message: text,
-            history: contextHistory,
-            assistantId: activeSession.assistantId,
-            systemInstruction: assistant?.systemInstruction,
-            preferredModel: settings.preferredModel,
-            image: image,
-            temperature: settings.temperature,
-          }),
+        // Direct Client-side Gemini Call
+        const data = await generateChatResponse({
+          message: text,
+          history: contextHistory,
+          assistantId: activeSession.assistantId,
+          systemInstruction: assistant?.systemInstruction,
+          preferredModel: settings.preferredModel,
+          image: image,
+          temperature: settings.temperature,
         });
-
-        if (!response.ok) {
-          const errData = await response.json();
-          throw new Error(errData.error || "Failed to fetch response from Gemini backend.");
-        }
-
-        const data = await response.json();
         aiContent = data.content;
-        aiTimestamp = data.timestamp || new Date().toISOString();
+        aiTimestamp = data.timestamp;
       }
 
       // Create AI Response Message

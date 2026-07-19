@@ -37,7 +37,9 @@ fun ChatWebView() {
                 webViewClient = WebViewClient()
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = true
-                loadUrl("https://ais-dev-f6g332sgotkqee5lw4whcn-653862462111.europe-west2.run.app")
+                settings.allowFileAccess = true
+                settings.allowContentAccess = true
+                loadUrl("file:///android_asset/www/index.html")
             }
         }
     )

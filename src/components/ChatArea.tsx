@@ -31,6 +31,7 @@ import { ChatMessage, ChatSession, AssistantPersona, ModelType, UserAccount } fr
 import { ASSISTANTS } from "../constants";
 import { motion, AnimatePresence } from "motion/react";
 import React, { useState, useRef, useEffect } from "react";
+import { enhancePrompt } from "../geminiClient";
 
 interface ChatAreaProps {
   session: ChatSession | null;
@@ -265,21 +266,8 @@ export default function ChatArea({
     setSpeechError(null);
 
     try {
-      const response = await fetch("/api/chat", {
-        method: "POST",
-        headers: { "Content-Type": "application/json" },
-        body: JSON.stringify({
-          message: `You are an expert prompt engineer. Rewrite the following user prompt to be highly detailed, clear, and context-rich so it gets an optimal response from an LLM. Return ONLY the enhanced prompt itself, without any introduction, comments, or quotes:\n\n"${inputText}"`,
-          preferredModel: "gemini-3.5-flash",
-          temperature: 0.5,
-        }),
-      });
-
-      if (!response.ok) throw new Error("Failed to optimize prompt");
-      const data = await response.json();
-      if (data.content) {
-        setInputText(data.content.trim());
-      }
+      const enhanced = await enhancePrompt(inputText);
+      setInputText(enhanced);
     } catch (err) {
       console.error(err);
       // Fallback local heuristic enhancer
