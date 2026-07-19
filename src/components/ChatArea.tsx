@@ -756,7 +756,7 @@ export default function ChatArea({
                 const queryLower = searchQuery.toLowerCase();
                 const filtered = sessions.filter((s) => {
                   const titleMatch = s.title.toLowerCase().includes(queryLower);
-                  const msgMatch = s.messages.some((m) => m.content.toLowerCase().includes(queryLower));
+                  const msgMatch = s.messages?.some((m) => m.content.toLowerCase().includes(queryLower)) || false;
                   return titleMatch || msgMatch;
                 });
 
@@ -863,7 +863,7 @@ export default function ChatArea({
                   </div>
                 </div>
               </div>
-            ) : session.messages.length === 0 ? (
+            ) : (!session?.messages || session.messages.length === 0) ? (
               /* ========================================================
                  CAPABILITIES DASHBOARD TOGGLE VIEW (Image 4 and Image 5)
                  ======================================================== */
@@ -908,7 +908,7 @@ export default function ChatArea({
                     {/* Header */}
                     <div>
                       <h2 className="text-2xl font-extrabold text-slate-900 tracking-tight font-display">
-                        Hey {user.name.split(" ")[0]}👋
+                        Hey {(user?.name || "User").split(" ")[0]}👋
                       </h2>
                       <p className="text-slate-900 font-extrabold text-base mt-1">
                         What would you like to do today?
@@ -1128,7 +1128,7 @@ export default function ChatArea({
                  MAIN CHAT MESSAGE FEED (List of bubbles)
                  ======================================================== */
               <div className="space-y-6 max-w-3xl mx-auto" id="message-feed-list">
-                {session.messages.map((msg) => {
+                {(session?.messages || []).map((msg) => {
                   const isUser = msg.role === "user";
                   
                   return (
@@ -1229,7 +1229,7 @@ export default function ChatArea({
                       {/* Right Avatar for User */}
                       {isUser && (
                         <div className="flex-shrink-0 w-8.5 h-8.5 rounded-xl bg-red-50 border border-red-100 flex items-center justify-center font-extrabold text-[10px] text-[#FF4D4D] shadow-xs uppercase font-mono">
-                          {user.name.charAt(0).toUpperCase() || "U"}
+                          {(user?.name || "U").charAt(0).toUpperCase()}
                         </div>
                       )}
                     </motion.div>

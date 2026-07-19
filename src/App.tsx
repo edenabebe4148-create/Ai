@@ -47,8 +47,50 @@ const DEFAULT_SETTINGS: UserSettings = {
 };
 
 export default function App() {
-  const [sessions, setSessions] = useState<ChatSession[]>([]);
-  const [activeSessionId, setActiveSessionId] = useState<string | null>(null);
+  const [sessions, setSessions] = useState<ChatSession[]>(() => {
+    const storedSessions = safeLocalStorage.getItem(LOCAL_STORAGE_SESSIONS_KEY);
+    if (storedSessions) {
+      try {
+        const parsedSessions = JSON.parse(storedSessions);
+        if (Array.isArray(parsedSessions) && parsedSessions.length > 0) {
+          return parsedSessions;
+        }
+      } catch (e) {
+        console.error("Error parsing sessions synchronously", e);
+      }
+    }
+    const defaultSession: ChatSession = {
+      id: "session_default_initial",
+      title: "Introduction Thread",
+      assistantId: "ava",
+      messages: [
+        {
+          id: "msg_welcome_initial",
+          role: "model",
+          content: "Hi there! I am **Ava**, your intelligent multi-modal assistant. Welcome to **Gemini Studio**.\n\nI can assist you with research, coding, writing, translating, or creative brainstorming. We are connected directly to a **full-stack Node.js server** hosting the latest high-fidelity Gemini models.\n\n### What can we do here?\n1. **Multiple Persona Assistants**: Tap the **New Thread** button in the sidebar to toggle specialised personas like Devo (Elite Coder), Lyra (Creative Copywriter), Kai (Language Tutor), and Zara (Technical Interviewer).\n2. **Multimodal Inputs**: Click the 📷 image attachment button below (or drag and drop an image onto the chat pane) to analyze images directly.\n3. **Voice Dictation**: Click the microphone icon to type using your voice.\n4. **Prompt Enhancer**: Click the ✨ magic wand to polish and expand any brief request with our prompt-optimization engine.\n5. **Read Aloud**: Click 'Read Aloud' on any of my messages to hear them spoken.\n\nHow can I help you kick off our conversation?",
+          timestamp: new Date().toISOString(),
+        }
+      ],
+      createdAt: new Date().toISOString(),
+      updatedAt: new Date().toISOString(),
+    };
+    safeLocalStorage.setItem(LOCAL_STORAGE_SESSIONS_KEY, JSON.stringify([defaultSession]));
+    return [defaultSession];
+  });
+
+  const [activeSessionId, setActiveSessionId] = useState<string | null>(() => {
+    const storedSessions = safeLocalStorage.getItem(LOCAL_STORAGE_SESSIONS_KEY);
+    if (storedSessions) {
+      try {
+        const parsedSessions = JSON.parse(storedSessions);
+        if (Array.isArray(parsedSessions) && parsedSessions.length > 0) {
+          return parsedSessions[0].id;
+        }
+      } catch (e) {}
+    }
+    return "session_default_initial";
+  });
+
   const [isGenerating, setIsGenerating] = useState(false);
   const [statusBarTime, setStatusBarTime] = useState("09:41");
 
@@ -66,7 +108,18 @@ export default function App() {
     const interval = setInterval(updateClock, 60000);
     return () => clearInterval(interval);
   }, []);
-  const [settings, setSettings] = useState<UserSettings>(DEFAULT_SETTINGS);
+
+  const [settings, setSettings] = useState<UserSettings>(() => {
+    const storedSettings = safeLocalStorage.getItem(LOCAL_STORAGE_SETTINGS_KEY);
+    if (storedSettings) {
+      try {
+        return JSON.parse(storedSettings);
+      } catch (e) {
+        console.error("Error parsing settings synchronously", e);
+      }
+    }
+    return DEFAULT_SETTINGS;
+  });
 
   // Sync theme to document body
   useEffect(() => {
@@ -125,52 +178,7 @@ export default function App() {
   };
 
 
-  // Load settings and sessions from LocalStorage on mount
-  useEffect(() => {
-    // Settings
-    const storedSettings = safeLocalStorage.getItem(LOCAL_STORAGE_SETTINGS_KEY);
-    if (storedSettings) {
-      try {
-        setSettings(JSON.parse(storedSettings));
-      } catch (e) {
-        console.error("Error parsing settings", e);
-      }
-    }
 
-    // Sessions
-    const storedSessions = safeLocalStorage.getItem(LOCAL_STORAGE_SESSIONS_KEY);
-    if (storedSessions) {
-      try {
-        const parsedSessions = JSON.parse(storedSessions);
-        setSessions(parsedSessions);
-        if (parsedSessions.length > 0) {
-          setActiveSessionId(parsedSessions[0].id);
-        }
-      } catch (e) {
-        console.error("Error parsing sessions", e);
-      }
-    } else {
-      // Create a default session to make the onboarding gorgeous
-      const defaultSession: ChatSession = {
-        id: `session_default_${Date.now()}`,
-        title: "Introduction Thread",
-        assistantId: "ava",
-        messages: [
-          {
-            id: `msg_welcome_${Date.now()}`,
-            role: "model",
-            content: "Hi there! I am **Ava**, your intelligent multi-modal assistant. Welcome to **Gemini Studio**.\n\nI can assist you with research, coding, writing, translating, or creative brainstorming. We are connected directly to a **full-stack Node.js server** hosting the latest high-fidelity Gemini models.\n\n### What can we do here?\n1. **Multiple Persona Assistants**: Tap the **New Thread** button in the sidebar to toggle specialised personas like Devo (Elite Coder), Lyra (Creative Copywriter), Kai (Language Tutor), and Zara (Technical Interviewer).\n2. **Multimodal Inputs**: Click the 📷 image attachment button below (or drag and drop an image onto the chat pane) to analyze images directly.\n3. **Voice Dictation**: Click the microphone icon to type using your voice.\n4. **Prompt Enhancer**: Click the ✨ magic wand to polish and expand any brief request with our prompt-optimization engine.\n5. **Read Aloud**: Click 'Read Aloud' on any of my messages to hear them spoken.\n\nHow can I help you kick off our conversation?",
-            timestamp: new Date().toISOString(),
-          }
-        ],
-        createdAt: new Date().toISOString(),
-        updatedAt: new Date().toISOString(),
-      };
-      setSessions([defaultSession]);
-      setActiveSessionId(defaultSession.id);
-      safeLocalStorage.setItem(LOCAL_STORAGE_SESSIONS_KEY, JSON.stringify([defaultSession]));
-    }
-  }, []);
 
   // Sync sessions to LocalStorage on change
   const saveSessions = (updatedSessions: ChatSession[]) => {
