@@ -35,10 +35,13 @@ fun ChatWebView() {
         factory = { context ->
             WebView(context).apply {
                 webViewClient = WebViewClient()
+                webChromeClient = android.webkit.WebChromeClient()
                 settings.javaScriptEnabled = true
                 settings.domStorageEnabled = true
                 settings.allowFileAccess = true
                 settings.allowContentAccess = true
+                settings.allowFileAccessFromFileURLs = true
+                settings.allowUniversalAccessFromFileURLs = true
                 loadUrl("file:///android_asset/www/index.html")
             }
         }
