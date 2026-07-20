@@ -28,7 +28,7 @@ export default function SettingsModal({
             initial={{ opacity: 0, scale: 0.95 }}
             animate={{ opacity: 1, scale: 1 }}
             exit={{ opacity: 0, scale: 0.95 }}
-            className="w-full max-w-md max-h-[82vh] flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden text-slate-800 dark:text-slate-100"
+            className="w-full max-w-md min-h-[400px] max-h-[82vh] flex flex-col bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-3xl shadow-2xl overflow-hidden text-slate-800 dark:text-slate-100"
             id="settings-modal"
           >
             {/* Header */}
@@ -47,7 +47,7 @@ export default function SettingsModal({
             </div>
 
           {/* Body */}
-          <div className="p-6 space-y-5 overflow-y-auto flex-1">
+          <div className="p-6 space-y-5 overflow-y-auto flex-1 min-h-0">
             {/* User Profile */}
             <div className="space-y-1.5">
               <label className="flex items-center gap-2 text-xs font-bold uppercase tracking-wider text-slate-400 dark:text-slate-500 font-mono">
