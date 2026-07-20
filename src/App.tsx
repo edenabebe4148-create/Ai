@@ -467,7 +467,7 @@ export default function App() {
   }
 
   return (
-    <div className="w-screen h-screen overflow-hidden flex items-center justify-center bg-gradient-to-tr from-slate-900 via-slate-950 to-slate-900 p-0 sm:p-4 md:p-6" id="app-universe">
+    <div className="fixed inset-0 overflow-hidden flex items-center justify-center bg-gradient-to-tr from-slate-900 via-slate-950 to-slate-900 p-0 sm:p-4 md:p-6" id="app-universe">
       {/* Centered Android Phone Mockup Wrapper */}
       <div 
         className="w-full h-full sm:max-w-[412px] sm:max-h-[846px] sm:aspect-[9/18.5] sm:rounded-[44px] sm:border-[10px] sm:border-slate-800 sm:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] sm:relative sm:overflow-hidden bg-white dark:bg-slate-950 flex flex-col transition-colors duration-300" 
