@@ -1,0 +1,10 @@
+<?xml version="1.0" encoding="utf-8"?>
+<network-security-config>
+    <domain-config cleartextTrafficPermitted="true">
+        <domain includeSubdomains="true">localhost</domain>
+        <domain includeSubdomains="true">127.0.0.1</domain>
+        <domain includeSubdomains="true">10.0.2.2</domain>
+    </domain-config>
+    <!-- Allow cleartext for private LAN IP ranges since Ollama/LM Studio run on the user's local network at arbitrary IPs -->
+    <base-config cleartextTrafficPermitted="true" />
+</network-security-config>
