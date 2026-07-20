@@ -45,3 +45,11 @@ export interface UserAccount {
   isAuthenticated: boolean;
 }
 
+declare global {
+  interface Window {
+    AndroidNetwork?: {
+      getDeviceIp: () => string;
+    };
+  }
+}
+

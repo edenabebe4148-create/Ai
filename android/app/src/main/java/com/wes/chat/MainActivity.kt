@@ -1,6 +1,9 @@
 package com.wes.chat
 
+import android.content.Context
+import android.net.wifi.WifiManager
 import android.os.Bundle
+import android.webkit.JavascriptInterface
 import android.webkit.WebView
 import android.webkit.WebViewClient
 import androidx.activity.ComponentActivity
@@ -28,6 +31,29 @@ class MainActivity : ComponentActivity() {
     }
 }
 
+class NetworkBridge(private val context: Context) {
+    @JavascriptInterface
+    fun getDeviceIp(): String {
+        return try {
+            val wifiManager = context.applicationContext.getSystemService(Context.WIFI_SERVICE) as WifiManager
+            val ipAddress = wifiManager.connectionInfo.ipAddress
+            if (ipAddress == 0) {
+                ""
+            } else {
+                String.format(
+                    "%d.%d.%d.%d",
+                    ipAddress and 0xff,
+                    ipAddress shr 8 and 0xff,
+                    ipAddress shr 16 and 0xff,
+                    ipAddress shr 24 and 0xff
+                )
+            }
+        } catch (e: Exception) {
+            ""
+        }
+    }
+}
+
 @Composable
 fun ChatWebView() {
     AndroidView(
@@ -42,6 +68,7 @@ fun ChatWebView() {
                 settings.allowContentAccess = true
                 settings.allowFileAccessFromFileURLs = true
                 settings.allowUniversalAccessFromFileURLs = true
+                addJavascriptInterface(NetworkBridge(context), "AndroidNetwork")
                 loadUrl("file:///android_asset/www/index.html")
             }
         }
