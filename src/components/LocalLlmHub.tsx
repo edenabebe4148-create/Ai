@@ -32,8 +32,9 @@ export default function LocalLlmHub({ settings, onSaveSettings }: LocalLlmHubPro
   const [loadingModels, setLoadingModels] = useState(false);
   const [showTroubleshoot, setShowTroubleshoot] = useState(false);
   
-  const [subnetInput, setSubnetInput] = useState("192.168.1");
+  const [subnetInput, setSubnetInput] = useState("");
   const [scanPort, setScanPort] = useState<number>(11434); // Default to Ollama port
+  const [isAutoDetected, setIsAutoDetected] = useState(false);
 
   const logContainerRef = useRef<HTMLDivElement>(null);
   const abortControllerRef = useRef<AbortController | null>(null);
@@ -45,18 +46,41 @@ export default function LocalLlmHub({ settings, onSaveSettings }: LocalLlmHubPro
     }
   }, [scanLogs]);
 
-  // Load models if local LLM URL is available
+  // Load models if local LLM URL is available with 600ms debounce
   useEffect(() => {
     if (settings.preferredModel === "local" && settings.localLlmUrl) {
-      fetchLocalModels();
+      const timer = setTimeout(() => {
+        fetchLocalModels();
+      }, 600);
+      return () => clearTimeout(timer);
     }
-  }, [settings.localLlmUrl, settings.localLlmProvider]);
+  }, [settings.localLlmUrl, settings.localLlmProvider, settings.preferredModel]);
+
+  // Auto-detect native subnet on mount
+  useEffect(() => {
+    if (typeof window.AndroidNetwork?.getDeviceIp === "function") {
+      const ip = window.AndroidNetwork.getDeviceIp();
+      if (ip) {
+        const parts = ip.split(".");
+        if (parts.length === 4) {
+          const subnet = parts.slice(0, 3).join(".");
+          setSubnetInput(subnet);
+          setIsAutoDetected(true);
+        }
+      }
+    }
+  }, []);
 
   const addLog = (msg: string) => {
     setScanLogs((prev) => [...prev, `[${new Date().toLocaleTimeString()}] ${msg}`]);
   };
 
   const fetchLocalModels = async () => {
+    try {
+      new URL(settings.localLlmUrl);
+    } catch {
+      return;
+    }
     setLoadingModels(true);
     setLocalModels([]);
     try {
@@ -95,7 +119,7 @@ export default function LocalLlmHub({ settings, onSaveSettings }: LocalLlmHubPro
           });
         }
       } else {
-        setLocalModels(["No models detected"]);
+        setLocalModels([]);
       }
     } catch (e: any) {
       console.warn("Could not retrieve models list automatically", e);
@@ -166,6 +190,7 @@ export default function LocalLlmHub({ settings, onSaveSettings }: LocalLlmHubPro
     addLog(`Targeting common LLM services (Ollama, LM Studio, Llama.cpp)`);
 
     const targets: { ip: string; port: number }[] = [];
+    const localFound: { ip: string; port: number; provider: string; modelCount: number }[] = [];
     
     // Add localhost & loopbacks
     targets.push({ ip: "127.0.0.1", port: 11434 });
@@ -198,17 +223,23 @@ export default function LocalLlmHub({ settings, onSaveSettings }: LocalLlmHubPro
             const url = `http://${target.ip}:${target.port}`;
             // Try fetching tags/models to identify service
             const controller = new AbortController();
-            const timeoutId = setTimeout(() => controller.abort(), 1200);
+            const timeoutId = setTimeout(() => controller.abort(), 2500);
 
-            // Test Ollama endpoint first
-            let detectedProvider = "Ollama";
-            let checkUrl = `${url}/api/tags`;
-            
-            if (target.port === 1234) {
+            // Derive provider and check endpoint from port
+            let detectedProvider = "";
+            let checkUrl = "";
+
+            if (target.port === 11434) {
+              detectedProvider = "Ollama";
+              checkUrl = `${url}/api/tags`;
+            } else if (target.port === 1234) {
               detectedProvider = "LM Studio";
               checkUrl = `${url}/v1/models`;
             } else if (target.port === 8080) {
               detectedProvider = "Llama.cpp";
+              checkUrl = `${url}/v1/models`;
+            } else {
+              detectedProvider = "Unknown/OpenAI-compatible";
               checkUrl = `${url}/v1/models`;
             }
 
@@ -227,14 +258,22 @@ export default function LocalLlmHub({ settings, onSaveSettings }: LocalLlmHubPro
               if (detectedProvider === "Ollama" && data.models) count = data.models.length;
               if (detectedProvider !== "Ollama" && data.data) count = data.data.length;
 
+              const serviceInfo = { ip: target.ip, port: target.port, provider: detectedProvider.toLowerCase(), modelCount: count };
               setFoundServices((prev) => [
                 ...prev,
-                { ip: target.ip, port: target.port, provider: detectedProvider.toLowerCase(), modelCount: count }
+                serviceInfo
               ]);
+              localFound.push(serviceInfo);
               addLog(`✨ FOUND: ${detectedProvider} active at ${target.ip}:${target.port}! (${count} models loaded)`);
+            } else {
+              addLog(`${target.ip}:${target.port} responded with HTTP ${res.status} — likely needs CORS/OLLAMA_ORIGINS configured`);
             }
-          } catch (e) {
-            // Service not responding or CORS failure (connection refused is caught here)
+          } catch (err: any) {
+            if (err?.name === "AbortError") {
+              addLog(`${target.ip}:${target.port} — timed out`);
+            } else {
+              addLog(`${target.ip}:${target.port} — unreachable (connection refused or CORS blocked)`);
+            }
           }
         })
       );
@@ -245,7 +284,7 @@ export default function LocalLlmHub({ settings, onSaveSettings }: LocalLlmHubPro
 
     setScanProgress(100);
     setIsScanning(false);
-    addLog(`Network scan complete. Found ${foundServices.length} active Local LLM instances.`);
+    addLog(`Network scan complete. Found ${localFound.length} active Local LLM instances.`);
   };
 
   const stopNetworkScan = () => {
@@ -446,14 +485,24 @@ export default function LocalLlmHub({ settings, onSaveSettings }: LocalLlmHubPro
         {/* Scan Inputs */}
         <div className="grid grid-cols-2 gap-2">
           <div>
-            <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider font-mono">
-              Wi-Fi Subnet
-            </label>
+            <div className="flex items-center justify-between">
+              <label className="text-[10px] font-extrabold text-slate-400 uppercase tracking-wider font-mono">
+                Wi-Fi Subnet
+              </label>
+              {isAutoDetected && (
+                <span className="text-[9px] font-extrabold text-emerald-500 bg-emerald-50 dark:bg-emerald-950/30 px-1.5 py-0.5 rounded-md leading-none animate-pulse">
+                  Auto-detected
+                </span>
+              )}
+            </div>
             <input
               type="text"
               value={subnetInput}
-              onChange={(e) => setSubnetInput(e.target.value)}
-              placeholder="e.g. 192.168.1"
+              onChange={(e) => {
+                setSubnetInput(e.target.value);
+                setIsAutoDetected(false);
+              }}
+              placeholder="e.g. 192.168.101"
               className="w-full mt-1 px-3 py-1.5 text-xs font-mono text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-[#FF4D4D] transition-colors"
               id="subnet-scan-input"
             />
