@@ -1,4 +1,4 @@
-import { Plus, MessageSquare, Trash2, Edit3, Settings, Menu, X, Check, LogOut, ShieldAlert } from "lucide-react";
+import { Plus, MessageSquare, Trash2, Edit3, Settings, Menu, X, Check, LogOut, ShieldAlert, Sun, Moon } from "lucide-react";
 import { ChatSession, AssistantPersona, UserSettings, UserAccount } from "../types";
 import { ASSISTANTS } from "../constants";
 import { motion, AnimatePresence } from "motion/react";
@@ -14,12 +14,11 @@ interface SidebarProps {
   onDeleteSession: (id: string) => void;
   onRenameSession: (id: string, newTitle: string) => void;
   onOpenSettings: () => void;
+  onSaveSettings?: (settings: UserSettings) => void;
   settings: UserSettings;
   isOpenMobile: boolean;
   onToggleMobile: () => void;
   user: UserAccount | null;
-  onLogout: () => void;
-  onTriggerAuth: (sc?: "signin" | "signup" | "verify" | "created" | "forgot") => void;
 }
 
 export default function Sidebar({
@@ -30,12 +29,11 @@ export default function Sidebar({
   onDeleteSession,
   onRenameSession,
   onOpenSettings,
+  onSaveSettings,
   settings,
   isOpenMobile,
   onToggleMobile,
   user,
-  onLogout,
-  onTriggerAuth,
 }: SidebarProps) {
   const [editingSessionId, setEditingSessionId] = useState<string | null>(null);
   const [renameValue, setRenameValue] = useState("");
@@ -69,41 +67,52 @@ export default function Sidebar({
   const logoSrc = settings.theme === "dark" ? logoBlack : logoWhite;
 
   const SidebarContent = (
-    <div className="flex flex-col h-full bg-slate-50 dark:bg-slate-950 border-r border-slate-200/80 dark:border-slate-850 text-slate-800 dark:text-slate-100">
+    <div className="flex flex-col h-full bg-slate-50/80 dark:bg-[#030308]/80 backdrop-blur-xl border-r border-slate-200/80 dark:border-neutral-800/80 text-slate-800 dark:text-slate-100 z-10">
       
       {/* Sidebar Header */}
-      <div className="flex items-center justify-between p-5 border-b border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900">
+      <div className="flex items-center justify-between px-5 pb-5 pt-[max(env(safe-area-inset-top),48px)] sm:p-5 border-b border-slate-200/60 dark:border-neutral-800/80 bg-white/70 dark:bg-[#09090d]/80 backdrop-blur-md">
         <div className="flex items-center gap-2.5">
-          <div className="flex items-center justify-center w-8.5 h-8.5 rounded-xl overflow-hidden bg-transparent">
-            <img
-              src={logoSrc}
-              alt="WesAiChat Logo"
-              className="w-8 h-8 object-contain"
-              referrerPolicy="no-referrer"
-            />
-          </div>
+          <img
+            src={logoSrc}
+            alt="Wes Ai Studio Logo"
+            className="w-9 h-9 rounded-xl object-contain shrink-0"
+            onError={(e) => {
+              (e.target as HTMLElement).style.display = 'none';
+            }}
+          />
           <div>
-            <h1 className="text-sm font-extrabold tracking-tight text-slate-900 dark:text-white font-display">WesAiChat</h1>
-            <span className="text-[9px] text-[#FF4D4D] font-mono font-bold tracking-wider uppercase">AI Assistant</span>
+            <h1 className="text-sm font-extrabold tracking-tight bg-gradient-to-r from-[#FF4D4D] via-rose-400 to-indigo-400 bg-clip-text text-transparent font-display">Wes Ai Studio</h1>
           </div>
         </div>
-        {isOpenMobile && (
-          <button
-            onClick={onToggleMobile}
-            className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-slate-100 md:hidden"
-            id="mobile-close-sidebar-btn"
-          >
-            <X className="w-5 h-5" />
-          </button>
-        )}
+        <div className="flex items-center gap-1">
+          {onSaveSettings && (
+            <button
+              onClick={() => onSaveSettings({ ...settings, theme: settings.theme === "dark" ? "light" : "dark" })}
+              className="p-1.5 text-slate-400 hover:text-slate-700 dark:hover:text-slate-200 transition-colors rounded-lg hover:bg-slate-100 dark:hover:bg-[#1c1c22]"
+              title={settings.theme === "dark" ? "Switch to Light Theme" : "Switch to Dark Theme"}
+              id="sidebar-quick-theme-toggle"
+            >
+              {settings.theme === "dark" ? <Sun className="w-4.5 h-4.5 text-amber-400" /> : <Moon className="w-4.5 h-4.5 text-indigo-500" />}
+            </button>
+          )}
+          {isOpenMobile && (
+            <button
+              onClick={onToggleMobile}
+              className="p-1.5 text-slate-400 hover:text-slate-600 transition-colors rounded-lg hover:bg-slate-100 md:hidden"
+              id="mobile-close-sidebar-btn"
+            >
+              <X className="w-5 h-5" />
+            </button>
+          )}
+        </div>
       </div>
 
       {/* New Chat Button Area */}
-      <div className="p-4 space-y-2 bg-white/50 dark:bg-slate-900/40 border-b border-slate-100 dark:border-slate-800">
+      <div className="p-4 space-y-2 bg-white/50 dark:bg-[#09090d]/60 border-b border-slate-100 dark:border-neutral-800/80">
         {!showAssistantPicker ? (
           <button
             onClick={() => setShowAssistantPicker(true)}
-            className="flex items-center justify-center gap-2 w-full py-3 px-4 text-sm font-bold text-white bg-[#FF4D4D] hover:bg-[#FF3333] active:bg-[#E63939] rounded-2xl transition-all shadow-md shadow-[#FF4D4D]/15 cursor-pointer hover:shadow-[#FF4D4D]/25"
+            className="flex items-center justify-center gap-2 w-full py-3 px-4 text-sm font-bold text-white bg-gradient-to-r from-[#FF4D4D] via-rose-500 to-pink-600 hover:opacity-95 active:scale-[0.98] rounded-2xl transition-all shadow-lg shadow-[#FF4D4D]/25 cursor-pointer hover:shadow-[#FF4D4D]/40"
             id="new-chat-btn"
           >
             <Plus className="w-4 h-4 stroke-[2.5]" />
@@ -179,7 +188,7 @@ export default function Sidebar({
                   }}
                   className={`group relative flex items-center gap-3 w-full p-3 rounded-2xl cursor-pointer transition-all border ${
                     isActive
-                      ? "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-white shadow-sm"
+                      ? "bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 text-slate-900 dark:text-[#FF4D4D] shadow-sm"
                       : "border-transparent text-slate-500 dark:text-slate-400 hover:bg-slate-200/50 dark:hover:bg-slate-800/40 hover:text-slate-800 dark:hover:text-slate-200"
                   }`}
                   id={`chat-session-${session.id}`}
@@ -221,7 +230,7 @@ export default function Sidebar({
                       </form>
                     ) : (
                       <div className="truncate">
-                        <div className={`text-xs font-bold truncate leading-tight ${isActive ? "text-slate-900 dark:text-white" : "text-slate-700 dark:text-slate-300"}`}>
+                        <div className={`text-xs font-bold truncate leading-tight ${isActive ? "text-slate-900 dark:text-[#FF4D4D]" : "text-slate-700 dark:text-slate-300"}`}>
                           {session.title}
                         </div>
                         <div className="text-[9px] text-slate-400 truncate mt-0.5 font-mono">
@@ -262,59 +271,38 @@ export default function Sidebar({
         )}
       </div>
 
-      {/* Bottom Profile / Auth Settings Card */}
+      {/* Bottom Profile Settings Card */}
       <div className="p-4 border-t border-slate-200/60 dark:border-slate-800 bg-white dark:bg-slate-900">
-        {user ? (
-          /* AUTHENTICATED USER BOX */
-          <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
-            <div className="flex items-center gap-2.5 min-w-0">
+        <div className="flex items-center justify-between bg-slate-50 dark:bg-slate-800/40 p-2.5 rounded-2xl border border-slate-100 dark:border-slate-800 shadow-xs">
+          <div className="flex items-center gap-2.5 min-w-0">
+            {user?.profilePicture ? (
+              <img src={user.profilePicture} alt="Profile" className="w-8 h-8 rounded-xl object-cover border border-[#FF4D4D]/10 shadow-xs" />
+            ) : (
               <div className="flex items-center justify-center w-8 h-8 rounded-xl bg-red-50 dark:bg-red-500/10 text-[#FF4D4D] font-extrabold border border-[#FF4D4D]/10 text-xs shadow-xs">
-                {user.name.charAt(0).toUpperCase() || "U"}
+                {(user?.name || "U").charAt(0).toUpperCase()}
               </div>
-              <div className="truncate">
-                <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate leading-tight">{user.name}</div>
-                <div className="text-[9px] text-slate-400 dark:text-slate-500 truncate font-mono leading-none mt-0.5">WesAiChat Member</div>
-              </div>
-            </div>
-            
-            <div className="flex items-center gap-0.5">
-              <button
-                onClick={onOpenSettings}
-                className="p-1.5 text-slate-400 transition-colors rounded-lg hover:text-slate-600 hover:bg-slate-100"
-                title="Settings"
-                id="sidebar-settings-btn"
-              >
-                <Settings className="w-4 h-4" />
-              </button>
-              <button
-                onClick={onLogout}
-                className="p-1.5 text-slate-400 transition-colors rounded-lg hover:text-rose-500 hover:bg-rose-50"
-                title="Sign Out"
-                id="sidebar-logout-btn"
-              >
-                <LogOut className="w-4 h-4" />
-              </button>
+            )}
+            <div className="truncate">
+              <div className="text-xs font-bold text-slate-800 dark:text-slate-200 truncate leading-tight">{user?.name || "User"}</div>
+              <div className="text-[9px] text-slate-400 dark:text-slate-500 truncate font-mono leading-none mt-0.5">Local Profile</div>
             </div>
           </div>
-        ) : (
-          /* UNAUTHENTICATED CALL TO ACTION BANNER */
-          <div className="flex flex-col space-y-2 p-3 bg-red-50/50 border border-red-100/60 rounded-2xl">
-            <div className="flex items-start gap-2">
-              <ShieldAlert className="w-4 h-4 text-[#FF4D4D] shrink-0 mt-0.5" />
-              <div>
-                <h4 className="text-[11px] font-bold text-slate-800">Unauthenticated Mode</h4>
-                <p className="text-[9px] text-slate-500 leading-normal mt-0.5">Features like threads history and customization are locked.</p>
-              </div>
-            </div>
+          
+          <div className="flex items-center gap-0.5">
             <button
-              onClick={() => onTriggerAuth("signin")}
-              className="w-full py-2 bg-[#FF4D4D] hover:bg-[#FF3333] active:bg-[#E63939] text-white font-bold rounded-xl text-xs transition-colors shadow-xs text-center cursor-pointer"
-              id="sidebar-signin-banner-btn"
+              onClick={(e) => {
+                e.preventDefault();
+                e.stopPropagation();
+                onOpenSettings();
+              }}
+              className="p-1.5 text-slate-400 transition-colors rounded-lg hover:text-slate-600 hover:bg-slate-100 dark:hover:bg-slate-800 cursor-pointer active:scale-95 touch-manipulation"
+              title="Settings"
+              id="sidebar-settings-btn"
             >
-              Sign In to Unlock
+              <Settings className="w-4 h-4" />
             </button>
           </div>
-        )}
+        </div>
       </div>
     </div>
   );

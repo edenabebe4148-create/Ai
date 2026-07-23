@@ -6,3 +6,14 @@ coverage/
 *.log
 .env*
 !.env.example
+
+# Android build artifacts
+android/.gradle/
+android/.idea/
+android/local.properties
+android/app/build/
+android/build/
+android/*.hprof
+
+# Keep releases folder (APKs)
+!releases/

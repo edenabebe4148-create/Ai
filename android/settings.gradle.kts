@@ -13,5 +13,5 @@ dependencyResolutionManagement {
     }
 }
 
-rootProject.name = "WesAiChat"
+rootProject.name = "WesAiStudio"
 include(":app")

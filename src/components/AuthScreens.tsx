@@ -115,7 +115,7 @@ export default function AuthWorkflow({
   };
 
   return (
-    <div className="absolute inset-0 z-50 flex flex-col bg-white dark:bg-slate-950 text-slate-900 dark:text-slate-100 select-none overflow-y-auto font-sans transition-colors duration-300" id="auth-workflow-viewport">
+    <div className="absolute inset-0 z-50 flex flex-col bg-white dark:bg-[#000000] text-slate-900 dark:text-slate-100 select-none overflow-y-auto font-sans transition-colors duration-300" id="auth-workflow-viewport">
       {/* Absolute top spacer representing mobile notch design */}
       <div className="w-full h-8 flex items-center justify-between px-6 py-2 text-xs font-semibold text-slate-800 dark:text-slate-350">
         <span>9:41</span>
@@ -144,7 +144,7 @@ export default function AuthWorkflow({
               {/* Header */}
               <div className="flex items-center justify-between py-4">
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
-                  WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                  Wes Ai Studio <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
                   <AlertCircle className="w-5 h-5" />
@@ -248,7 +248,7 @@ export default function AuthWorkflow({
               {/* Header */}
               <div className="flex items-center justify-between py-4">
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
-                  WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                  Wes Ai Studio <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
                   <AlertCircle className="w-5 h-5" />
@@ -357,7 +357,7 @@ export default function AuthWorkflow({
               {/* Header */}
               <div className="flex items-center justify-between py-4">
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
-                  WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                  Wes Ai Studio <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
                   <AlertCircle className="w-5 h-5" />
@@ -443,7 +443,7 @@ export default function AuthWorkflow({
                   <LayoutGrid className="w-5 h-5" />
                 </button>
                 <span className="text-slate-900 dark:text-white font-extrabold text-lg font-display">
-                  WesAiChat
+                  Wes Ai Studio
                 </span>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
                   <AlertCircle className="w-5 h-5" />
@@ -499,7 +499,7 @@ export default function AuthWorkflow({
               {/* Header */}
               <div className="flex items-center justify-between py-4">
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
-                  WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                  Wes Ai Studio <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
                   <AlertCircle className="w-5 h-5" />
@@ -570,7 +570,7 @@ export default function AuthWorkflow({
               {/* Header */}
               <div className="flex items-center justify-between py-4">
                 <button className="flex items-center gap-1 text-[#FF4D4D] font-bold text-lg font-display cursor-pointer">
-                  WesAiChat <ChevronDown className="w-4 h-4 stroke-[2.5]" />
+                  Wes Ai Studio <ChevronDown className="w-4 h-4 stroke-[2.5]" />
                 </button>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
                   <AlertCircle className="w-5 h-5" />
@@ -676,7 +676,7 @@ export default function AuthWorkflow({
                   <LayoutGrid className="w-5 h-5" />
                 </button>
                 <span className="text-[#FF4D4D] font-extrabold text-lg font-display">
-                  WesAiChat
+                  Wes Ai Studio
                 </span>
                 <button onClick={onClose} className="p-1 text-slate-400 hover:text-slate-600 dark:hover:text-slate-200 cursor-pointer transition-colors">
                   <AlertCircle className="w-5 h-5" />

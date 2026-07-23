@@ -128,7 +128,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
   };
 
   return (
-    <div className="fixed inset-0 z-50 flex flex-col justify-between bg-white dark:bg-slate-950 text-slate-950 dark:text-slate-100 font-sans select-none overflow-hidden transition-colors duration-300" id="onboarding-viewport">
+    <div className="fixed inset-0 z-50 flex flex-col justify-between bg-white dark:bg-[#000000] text-slate-950 dark:text-slate-100 font-sans select-none overflow-hidden transition-colors duration-300" id="onboarding-viewport">
       {/* Top Slide content */}
       <div className="flex-1 flex flex-col items-center justify-center p-6 md:p-12 max-w-lg mx-auto w-full">
         <AnimatePresence mode="wait">
@@ -158,7 +158,7 @@ export default function OnboardingScreen({ onComplete }: OnboardingScreenProps) 
 
             {/* Typography Content Container */}
             <div className="space-y-3 px-4">
-              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-white tracking-tight font-display">
+              <h2 className="text-2xl md:text-3xl font-extrabold text-slate-900 dark:text-[#FF4D4D] tracking-tight font-display">
                 {slides[currentSlide].title}
               </h2>
               <p className="text-sm md:text-base text-slate-500 dark:text-slate-400 leading-relaxed font-normal">

@@ -8,14 +8,14 @@ import { ChatSession, ChatMessage, UserSettings, ModelType, UserAccount } from "
 import { ASSISTANTS } from "./constants";
 import { generateChatResponse } from "./geminiClient";
 
-const LOCAL_STORAGE_SESSIONS_KEY = "gemini_studio_sessions_v1";
-const LOCAL_STORAGE_SETTINGS_KEY = "gemini_studio_settings_v1";
-const LOCAL_STORAGE_USER_KEY = "chatterly_user_v1";
+const LOCAL_STORAGE_SESSIONS_KEY = "wes_ai_sessions_v1";
+const LOCAL_STORAGE_SETTINGS_KEY = "wes_ai_settings_v1";
+const LOCAL_STORAGE_USER_KEY = "wes_ai_user_v1";
 
 const safeLocalStorage = {
   getItem: (key: string): string | null => {
     try {
-      return localStorage.getItem(key);
+      return localStorage.getItem(key) || localStorage.getItem(key.replace("wes_ai_", "gemini_studio_")) || localStorage.getItem(key.replace("wes_ai_", "chatterly_"));
     } catch (e) {
       console.warn("localStorage.getItem blocked/failed:", e);
       return null;
@@ -41,10 +41,11 @@ const DEFAULT_SETTINGS: UserSettings = {
   userName: "User Guest",
   preferredModel: "gemini-3.5-flash",
   temperature: 0.7,
+  activeProvider: "gemini",
   localLlmProvider: "ollama",
   localLlmUrl: "http://localhost:11434",
   localLlmModel: "",
-  theme: "light",
+  theme: "dark",
 };
 
 export default function App() {
@@ -64,14 +65,7 @@ export default function App() {
       id: "session_default_initial",
       title: "Introduction Thread",
       assistantId: "ava",
-      messages: [
-        {
-          id: "msg_welcome_initial",
-          role: "model",
-          content: "Hi there! I am **Ava**, your intelligent multi-modal assistant. Welcome to **Gemini Studio**.\n\nI can assist you with research, coding, writing, translating, or creative brainstorming. We are connected directly to a **full-stack Node.js server** hosting the latest high-fidelity Gemini models.\n\n### What can we do here?\n1. **Multiple Persona Assistants**: Tap the **New Thread** button in the sidebar to toggle specialised personas like Devo (Elite Coder), Lyra (Creative Copywriter), Kai (Language Tutor), and Zara (Technical Interviewer).\n2. **Multimodal Inputs**: Click the 📷 image attachment button below (or drag and drop an image onto the chat pane) to analyze images directly.\n3. **Voice Dictation**: Click the microphone icon to type using your voice.\n4. **Prompt Enhancer**: Click the ✨ magic wand to polish and expand any brief request with our prompt-optimization engine.\n5. **Read Aloud**: Click 'Read Aloud' on any of my messages to hear them spoken.\n\nHow can I help you kick off our conversation?",
-          timestamp: new Date().toISOString(),
-        }
-      ],
+      messages: [],
       createdAt: new Date().toISOString(),
       updatedAt: new Date().toISOString(),
     };
@@ -87,7 +81,7 @@ export default function App() {
         if (Array.isArray(parsedSessions) && parsedSessions.length > 0) {
           return parsedSessions[0].id;
         }
-      } catch (e) {}
+      } catch (e) { }
     }
     return "session_default_initial";
   });
@@ -136,37 +130,49 @@ export default function App() {
     return safeLocalStorage.getItem("gemini_studio_onboarding_completed_v1") !== "true";
   });
 
-  // Authentication State
-  const [user, setUser] = useState<UserAccount | null>(() => {
+  useEffect(() => {
+    (window as any).onAndroidBackPressed = () => {
+      if (isSettingsOpen) {
+        setIsSettingsOpen(false);
+        return true; // Consumed
+      }
+      if (isSidebarMobileOpen) {
+        setIsSidebarMobileOpen(false);
+        return true; // Consumed
+      }
+      return false; // Not consumed, will exit app
+    };
+  }, [isSettingsOpen, isSidebarMobileOpen]);
+
+  // Local Profile State
+  const [user, setUser] = useState<UserAccount>(() => {
     const stored = safeLocalStorage.getItem(LOCAL_STORAGE_USER_KEY);
     if (stored) {
       try {
-        return JSON.parse(stored);
+        const parsed = JSON.parse(stored);
+        if (parsed && typeof parsed === 'object') {
+          return { ...parsed, isAuthenticated: true };
+        }
       } catch {
-        return null;
+        // fall through
       }
     }
-    return null;
+    return {
+      name: "User",
+      email: "local@wes.ai",
+      isAuthenticated: true,
+      profilePicture: ""
+    };
   });
-  
-  // Auth Modal/Overlay state: which screen to show
-  const [authScreen, setAuthScreen] = useState<"signin" | "signup" | "verify" | "created" | "forgot" | null>(null);
+
+  const handleSaveProfile = (updatedUser: UserAccount) => {
+    setUser(updatedUser);
+    safeLocalStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(updatedUser));
+  };
 
   const handleOnboardingComplete = () => {
     safeLocalStorage.setItem("gemini_studio_onboarding_completed_v1", "true");
     setShowOnboarding(false);
-  };
-
-  const handleAuthSuccess = (authenticatedUser: UserAccount) => {
-    setUser(authenticatedUser);
-    safeLocalStorage.setItem(LOCAL_STORAGE_USER_KEY, JSON.stringify(authenticatedUser));
-    
-    // Auto-update user name in general settings based on auth name
-    const updatedSettings = { ...settings, userName: authenticatedUser.name };
-    setSettings(updatedSettings);
-    safeLocalStorage.setItem(LOCAL_STORAGE_SETTINGS_KEY, JSON.stringify(updatedSettings));
-
-    setAuthScreen(null);
   };
 
   const handleLogout = () => {
@@ -196,6 +202,33 @@ export default function App() {
   // Create a New Chat Thread
   const handleNewChat = (assistantId: string) => {
     const assistant = ASSISTANTS.find((a) => a.id === assistantId);
+
+    // Check if the current active session is untouched (0 messages or 1 model welcome message)
+    const activeSession = sessions.find(s => s.id === activeSessionId);
+    const isUntouched = activeSession && (
+      activeSession.messages.length === 0 ||
+      (activeSession.messages.length === 1 && activeSession.messages[0].role === "model")
+    );
+
+    if (isUntouched) {
+      const updatedSessions = sessions.map(s => {
+        if (s.id === activeSessionId) {
+          return {
+            ...s,
+            assistantId: assistantId,
+            title: `New Session (${assistant?.name || "General"})`,
+            messages: [], // Clear any previous welcome message to show the Grid!
+            updatedAt: new Date().toISOString()
+          };
+        }
+        return s;
+      });
+      saveSessions(updatedSessions);
+      setIsSidebarMobileOpen(false);
+      return;
+    }
+
+    // Otherwise, create a brand new session
     const newSession: ChatSession = {
       id: `session_${Date.now()}`,
       title: `New Session (${assistant?.name || "General"})`,
@@ -256,7 +289,7 @@ export default function App() {
 
     const assistant = ASSISTANTS.find((a) => a.id === activeSession.assistantId);
 
-    let markdown = `# Gemini Studio Chat Export\n`;
+    let markdown = `# Wes Ai Studio Chat Export\n`;
     markdown += `**Thread Title**: ${activeSession.title}\n`;
     markdown += `**Assistant Persona**: ${assistant?.name} (${assistant?.role})\n`;
     markdown += `**Export Date**: ${new Date().toLocaleString()}\n`;
@@ -284,7 +317,7 @@ export default function App() {
   };
 
   // Core Send Message pipeline
-  const handleSendMessage = async (text: string, image?: string) => {
+  const handleSendMessage = async (text: string, image?: string, fileName?: string) => {
     if (!activeSessionId) return;
 
     const activeSession = sessions.find((s) => s.id === activeSessionId);
@@ -298,6 +331,7 @@ export default function App() {
       role: "user",
       content: text,
       image: image,
+      fileName: fileName,
       timestamp: new Date().toISOString(),
     };
 
@@ -330,73 +364,19 @@ export default function App() {
       let aiContent = "";
       let aiTimestamp = new Date().toISOString();
 
-      if (settings.preferredModel === "local") {
-        // Direct Client-to-Local LLM Fetch
-        const resolvedUrl = settings.localLlmUrl.replace(/\/$/, "");
-        let localEndpoint = "";
-        let requestBody: any = {};
-        
-        if (settings.localLlmProvider === "ollama") {
-          localEndpoint = `${resolvedUrl}/api/chat`;
-          requestBody = {
-            model: settings.localLlmModel || "llama3.2",
-            messages: [
-              { role: "system", content: assistant?.systemInstruction || "You are a helpful assistant." },
-              ...contextHistory.map((m) => ({
-                role: m.role === "user" ? "user" : "assistant",
-                content: m.content,
-              })),
-              { role: "user", content: text },
-            ],
-            stream: false,
-          };
-        } else {
-          // LM Studio, Llama.cpp, OpenAI-compatible
-          localEndpoint = `${resolvedUrl}/v1/chat/completions`;
-          requestBody = {
-            model: settings.localLlmModel || "default",
-            messages: [
-              { role: "system", content: assistant?.systemInstruction || "You are a helpful assistant." },
-              ...contextHistory.map((m) => ({
-                role: m.role === "user" ? "user" : "assistant",
-                content: m.content,
-              })),
-              { role: "user", content: text },
-            ],
-            temperature: settings.temperature,
-          };
-        }
-
-        const localRes = await fetch(localEndpoint, {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
-          body: JSON.stringify(requestBody),
-        });
-
-        if (!localRes.ok) {
-          throw new Error(`Local LLM responded with status ${localRes.status}`);
-        }
-
-        const data = await localRes.json();
-        if (settings.localLlmProvider === "ollama") {
-          aiContent = data.message?.content || "No content returned from local Ollama.";
-        } else {
-          aiContent = data.choices?.[0]?.message?.content || "No content returned from OpenAI-compatible local API.";
-        }
-      } else {
-        // Direct Client-side Gemini Call
-        const data = await generateChatResponse({
-          message: text,
-          history: contextHistory,
-          assistantId: activeSession.assistantId,
-          systemInstruction: assistant?.systemInstruction,
-          preferredModel: settings.preferredModel,
-          image: image,
-          temperature: settings.temperature,
-        });
-        aiContent = data.content;
-        aiTimestamp = data.timestamp;
-      }
+      // Call Multi-Provider AI Dispatcher
+      const data = await generateChatResponse({
+        message: text,
+        history: contextHistory,
+        assistantId: activeSession.assistantId,
+        systemInstruction: assistant?.systemInstruction,
+        preferredModel: settings.preferredModel,
+        image: image,
+        temperature: settings.temperature,
+        settings: settings,
+      });
+      aiContent = data.content;
+      aiTimestamp = data.timestamp;
 
       // Create AI Response Message
       const aiMessage: ChatMessage = {
@@ -420,7 +400,7 @@ export default function App() {
 
     } catch (error: any) {
       console.error(error);
-      
+
       let errorPromptMsg = "";
       if (settings.preferredModel === "local") {
         errorPromptMsg = `⚠️ **Local LLM Connection Failure**: Could not establish communication with your local LLM server at \`${settings.localLlmUrl}\`.
@@ -463,7 +443,7 @@ export default function App() {
   const activeSession = sessions.find((s) => s.id === activeSessionId) || null;
 
   const isAndroidWebView = typeof navigator !== 'undefined' && (
-    /wv/i.test(navigator.userAgent) || 
+    /wv/i.test(navigator.userAgent) ||
     /Android.*Version\/[0-9.]+/i.test(navigator.userAgent)
   );
 
@@ -472,13 +452,13 @@ export default function App() {
   }
 
   return (
-    <div 
-      className={isAndroidWebView ? "fixed inset-0 overflow-hidden flex flex-col w-full h-full bg-white dark:bg-slate-950" : "fixed inset-0 overflow-hidden flex flex-col flex-1 h-full w-full sm:items-center sm:justify-center bg-gradient-to-tr from-slate-900 via-slate-950 to-slate-900 p-0 sm:p-4 md:p-6"} 
+    <div
+      className={isAndroidWebView ? "fixed inset-0 overflow-hidden flex flex-col w-full h-full bg-white dark:bg-slate-950" : "fixed inset-0 overflow-hidden flex flex-col flex-1 h-full w-full sm:items-center sm:justify-center bg-gradient-to-tr from-slate-900 via-slate-950 to-slate-900 p-0 sm:p-4 md:p-6"}
       id="app-universe"
     >
       {/* Centered Android Phone Mockup Wrapper */}
-      <div 
-        className={isAndroidWebView ? "w-full h-full flex flex-col relative overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300" : "w-full h-full flex-1 sm:flex-initial sm:max-w-[412px] sm:max-h-[846px] sm:aspect-[9/18.5] sm:rounded-[44px] sm:border-[10px] sm:border-slate-800 sm:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] sm:relative sm:overflow-hidden bg-white dark:bg-slate-950 flex flex-col transition-colors duration-300"} 
+      <div
+        className={isAndroidWebView ? "w-full h-full flex flex-col relative overflow-hidden bg-white dark:bg-slate-950 transition-colors duration-300" : "w-full h-full flex-1 sm:flex-initial sm:max-w-[412px] sm:max-h-[846px] sm:aspect-[9/18.5] sm:rounded-[44px] sm:border-[10px] sm:border-slate-800 sm:shadow-[0_25px_50px_-12px_rgba(0,0,0,0.8)] sm:relative sm:overflow-hidden bg-white dark:bg-slate-950 flex flex-col transition-colors duration-300"}
         id="phone-device-frame"
       >
         {/* PHYSICAL CAMERA NOTCH / PUNCH HOLE (Only on desktop simulator layout) */}
@@ -490,22 +470,22 @@ export default function App() {
 
         {/* ANDROID STATUS BAR (high-fidelity mockup) */}
         {!isAndroidWebView && (
-          <div className="w-full h-7 bg-white dark:bg-slate-900 border-b border-slate-50 dark:border-slate-800/80 flex items-center justify-between px-6 text-xs font-bold text-slate-700 dark:text-slate-300 select-none shrink-0 z-30 transition-colors duration-300" id="android-status-bar">
+          <div className="w-full h-7 bg-white dark:bg-[#000000] border-b border-slate-50 dark:border-neutral-900 flex items-center justify-between px-6 text-xs font-bold text-slate-700 dark:text-slate-300 select-none shrink-0 z-30 transition-colors duration-300" id="android-status-bar">
             <span className="font-sans font-semibold tracking-tight">{statusBarTime}</span>
             <div className="flex items-center gap-1.5">
               {/* Small dynamic status indicators */}
               <svg className="w-3.5 h-3.5 fill-slate-700 dark:fill-slate-300 transition-colors duration-300" viewBox="0 0 24 24">
                 <title>LTE Signal</title>
-                <path d="M2 22h20V2z"/>
+                <path d="M2 22h20V2z" />
               </svg>
               <svg className="w-3.5 h-3.5 fill-slate-700 dark:fill-slate-300 transition-colors duration-300" viewBox="0 0 24 24">
                 <title>Wifi Connected</title>
-                <path d="M12 21l-12-18h24z"/>
+                <path d="M12 21l-12-18h24z" />
               </svg>
               <div className="flex items-center gap-0.5" title="Battery 84%">
                 <span className="text-[9px] font-mono font-extrabold mr-0.5">84%</span>
                 <svg className="w-4 h-4 fill-slate-700 dark:fill-slate-300 transition-colors duration-300" viewBox="0 0 24 24">
-                  <path d="M17 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm1 9h-1V9h1v5z"/>
+                  <path d="M17 5H3a2 2 0 0 0-2 2v10a2 2 0 0 0 2 2h14a2 2 0 0 0 2-2V7a2 2 0 0 0-2-2zm1 9h-1V9h1v5z" />
                 </svg>
               </div>
             </div>
@@ -513,7 +493,14 @@ export default function App() {
         )}
 
         {/* CORE APPLICATION BODY */}
-        <div className="flex-1 relative flex flex-col overflow-hidden w-full bg-white dark:bg-slate-950 transition-colors duration-300" id="android-app-viewport">
+        <div className="flex-1 relative flex flex-col overflow-hidden w-full bg-white/95 dark:bg-[#030308]/95 transition-colors duration-300" id="android-app-viewport">
+
+          {/* FLOWING AURORA COLOR MESH BACKGROUND BLOBS */}
+          <div className="absolute inset-0 pointer-events-none overflow-hidden z-0 opacity-30 dark:opacity-25">
+            <div className="absolute -top-32 -left-32 w-96 h-96 rounded-full bg-gradient-to-tr from-[#FF4D4D] via-rose-600 to-pink-500 blur-3xl animate-aurora-1"></div>
+            <div className="absolute top-1/3 -right-32 w-96 h-96 rounded-full bg-gradient-to-tr from-violet-600 via-indigo-600 to-purple-500 blur-3xl animate-aurora-2"></div>
+            <div className="absolute -bottom-32 left-1/4 w-96 h-96 rounded-full bg-gradient-to-tr from-cyan-500 via-teal-500 to-emerald-500 blur-3xl animate-aurora-3"></div>
+          </div>
           {/* Sidebar - Sessions & Navigation */}
           <Sidebar
             sessions={sessions}
@@ -522,13 +509,15 @@ export default function App() {
             onNewChat={handleNewChat}
             onDeleteSession={handleDeleteSession}
             onRenameSession={handleRenameSession}
-            onOpenSettings={() => setIsSettingsOpen(true)}
+            onOpenSettings={() => {
+              setIsSettingsOpen(true);
+              setIsSidebarMobileOpen(false);
+            }}
+            onSaveSettings={handleSaveSettings}
             settings={settings}
             isOpenMobile={isSidebarMobileOpen}
             onToggleMobile={() => setIsSidebarMobileOpen(!isSidebarMobileOpen)}
             user={user}
-            onLogout={handleLogout}
-            onTriggerAuth={(sc) => setAuthScreen(sc || "signin")}
           />
 
           {/* Main Chat Workstation */}
@@ -536,41 +525,37 @@ export default function App() {
             session={activeSession}
             onSendMessage={handleSendMessage}
             onClearSession={handleClearSession}
-            onExportSession={handleExportSession}
             isGenerating={isGenerating}
             onToggleSidebarMobile={() => setIsSidebarMobileOpen(true)}
             preferredModel={settings.preferredModel}
+            settings={settings}
+            onSaveSettings={handleSaveSettings}
             user={user}
-            onTriggerAuth={(sc) => setAuthScreen(sc || "signin")}
             sessions={sessions}
             onSelectSession={setActiveSessionId}
             onDeleteSession={handleDeleteSession}
             onNewChat={handleNewChat}
             onStopGenerating={() => setIsGenerating(false)}
+            onOpenSettings={() => {
+              setIsSettingsOpen(true);
+              setIsSidebarMobileOpen(false);
+            }}
           />
 
-          {/* Custom Preference Drawer/Modal */}
           <SettingsModal
             isOpen={isSettingsOpen}
             onClose={() => setIsSettingsOpen(false)}
             settings={settings}
             onSaveSettings={handleSaveSettings}
+            user={user}
+            onSaveProfile={handleSaveProfile}
           />
-
-          {/* High-Fidelity Auth Screen overlay */}
-          {authScreen && (
-            <AuthWorkflow
-              initialScreen={authScreen}
-              onAuthSuccess={handleAuthSuccess}
-              onClose={() => setAuthScreen(null)}
-            />
-          )}
         </div>
 
         {/* ANDROID BOTTOM NAVIGATION GESTURE PILL BAR */}
         {!isAndroidWebView && (
-          <div className="w-full h-6 bg-white flex items-center justify-center select-none shrink-0 border-t border-slate-50 z-30" id="android-gesture-navigation">
-            <div className="w-24 h-1 bg-slate-400 rounded-full opacity-60 hover:opacity-80 transition-opacity"></div>
+          <div className="w-full h-6 bg-white dark:bg-[#000000] flex items-center justify-center select-none shrink-0 border-t border-slate-50 dark:border-neutral-900 z-30" id="android-gesture-navigation">
+            <div className="w-24 h-1 bg-slate-400 dark:bg-neutral-600 rounded-full opacity-60 hover:opacity-80 transition-opacity"></div>
           </div>
         )}
       </div>

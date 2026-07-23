@@ -359,7 +359,7 @@ export default function LocalLlmHub({ settings, onSaveSettings }: LocalLlmHubPro
                 type="button"
                 onClick={handleTestConnection}
                 disabled={isTesting}
-                className="px-3 bg-slate-800 hover:bg-slate-700 dark:bg-slate-700 dark:hover:bg-slate-600 disabled:opacity-50 text-white text-xs font-bold rounded-xl flex items-center gap-1 transition-colors cursor-pointer shrink-0"
+                className="px-3 bg-slate-800 hover:bg-slate-700 dark:bg-[#252535] dark:hover:bg-[#303045] disabled:opacity-50 text-white text-xs font-bold rounded-xl flex items-center gap-1 transition-colors cursor-pointer shrink-0 border border-transparent dark:border-neutral-700"
                 id="test-connection-btn"
               >
                 {isTesting ? <RefreshCw className="w-3.5 h-3.5 animate-spin" /> : "Test"}
@@ -408,15 +408,15 @@ export default function LocalLlmHub({ settings, onSaveSettings }: LocalLlmHubPro
             <select
               value={settings.localLlmModel}
               onChange={(e) => onSaveSettings({ ...settings, localLlmModel: e.target.value })}
-              className="w-full px-3 py-2 mt-1 text-xs font-mono font-medium text-slate-800 dark:text-slate-100 bg-white dark:bg-slate-900 border border-slate-200 dark:border-slate-800 rounded-xl focus:outline-none focus:border-[#FF4D4D] cursor-pointer transition-colors"
+              className="w-full px-3 py-2 mt-1 text-xs font-mono font-medium text-slate-800 dark:text-white bg-white dark:bg-[#181824] border border-slate-200 dark:border-neutral-800 rounded-xl focus:outline-none focus:border-[#FF4D4D] cursor-pointer transition-colors"
               id="local-model-picker"
             >
               {localModels.map((model) => (
-                <option key={model} value={model} className="dark:bg-slate-900 text-slate-850 dark:text-slate-100">{model}</option>
+                <option key={model} value={model} className="bg-white dark:bg-[#181824] text-slate-850 dark:text-white">{model}</option>
               ))}
             </select>
           ) : (
-            <div className="p-2.5 border border-dashed border-slate-200 dark:border-slate-800 bg-white dark:bg-slate-900/60 text-[11px] text-slate-500 dark:text-slate-400 rounded-xl text-center italic transition-colors">
+            <div className="p-2.5 border border-dashed border-slate-200 dark:border-neutral-800 bg-white dark:bg-[#181824]/60 text-[11px] text-slate-500 dark:text-slate-400 rounded-xl text-center italic transition-colors">
               {loadingModels ? "Quering local server models..." : "No local models cached. Click test connection or reload."}
             </div>
           )}

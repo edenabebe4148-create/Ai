@@ -1,11 +1,11 @@
 {
-  "name": "react-example",
+  "name": "wes-ai-studio",
   "private": true,
   "version": "0.0.0",
   "type": "module",
   "scripts": {
     "dev": "vite",
-    "build": "vite build && mkdir -p android/app/src/main/assets/www && cp -R dist/* android/app/src/main/assets/www/ && node -e \"const fs = require('fs'); const f = 'android/app/src/main/assets/www/index.html'; if (fs.existsSync(f)) { fs.writeFileSync(f, fs.readFileSync(f, 'utf8').replace(/\\bcrossorigin\\b/g, '')); }\"",
+    "build": "vite build && node scripts/copy-android-assets.cjs",
     "preview": "vite preview",
     "clean": "rm -rf dist",
     "lint": "tsc --noEmit"
